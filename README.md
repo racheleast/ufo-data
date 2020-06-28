@@ -6,6 +6,7 @@
   - identify outliers
   - identify datapoints of questionable integrity, including type mismatches
   - identify and characterize the flaps
+  - are there multiple reports per occurrence / event?
   
   
 ## Hypotheses / Claims / Questions to Answer

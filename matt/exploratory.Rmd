@@ -9,6 +9,30 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Plots
 
+```{r echo=FALSE, include=FALSE}
+
+library(tidyverse)
+library(here)
+
+here::here()
+
+data <- read_csv(here("nuforc_reports.csv"))
+
+
+
+
+shape <- data %>% group_by(shape) %>% summarise(count = n()) %>% arrange(desc(count))
+
+states <- data %>% group_by(state) %>% summarise(count = n()) %>% arrange(desc(count))
+```
+
+```{r}
+ggplot(shape, aes(x = reorder(shape, -count), y = count)) + geom_col() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .35))
+
+ggplot(states, aes(x = reorder(state, -count), y = count)) + geom_col() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .35))
+```
 
