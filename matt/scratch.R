@@ -12,6 +12,11 @@ data <- read_csv("nuforc_reports.csv")
 
 
 
+data$primary_key <- 1:nrow(data)
+
+
+
+
 shape <- data %>% group_by(shape) %>% summarise(count = n()) %>% arrange(desc(count))
 
 
