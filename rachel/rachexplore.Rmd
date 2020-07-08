@@ -8,32 +8,50 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-
-
-
-
-
-```{r echo=FALSE}
-
-
-```
-
-
-
 ```{r echo=FALSE, include=FALSE}
-
-
-
-
 
 library(mapview)
 library(sf)
 library(tidyverse)
 library(here)
+library(ggplot2)
+library(ggmap)
+library(rworldmap)
 
 here::here()
 
 data <- read_csv(here("nuforc_reports.csv"))
 
-
 ```
+
+
+
+```{r map}
+
+longitudes <- na.omit(data$city_longitude) # Get rid of N/A rows 
+latitudes <- na.omit(data$city_latitude) # Get rid of N/A rows
+
+newrows <- data.frame(longitudes,latitudes) # Create new data frame with our revised variables
+
+world <- getMap(resolution = "low") # Get data for map
+
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = newrows, aes(x = longitudes, y = latitudes) , colour = "red", cex = .05 ) + # Plot Data
+    theme_classic() + # Remove Grey Background
+    ylim(10, 70) +
+    xlim(-170,-50) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings"))
+```
+
+
+
+
+
+
+
+
+
