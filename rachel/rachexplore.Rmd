@@ -1,0 +1,39 @@
+---
+title: "rachexplore"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+
+
+```{r echo=FALSE}
+
+
+```
+
+
+
+```{r echo=FALSE, include=FALSE}
+
+
+
+
+
+library(mapview)
+library(sf)
+library(tidyverse)
+library(here)
+
+here::here()
+
+data <- read_csv(here("nuforc_reports.csv"))
+
+
+```
