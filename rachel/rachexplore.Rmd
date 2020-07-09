@@ -17,6 +17,7 @@ library(here)
 library(ggplot2)
 library(ggmap)
 library(rworldmap)
+library(readxl)
 
 here::here()
 
@@ -87,4 +88,30 @@ world <- getMap(resolution = "low") # Get data for map
     xlab("Longitude") +
     ylab("Latitude") +
     ggtitle("UFO Sightings After 2005"))
+```
+
+
+```{r}
+NuclearData <- read_excel(here("NuclearData.xlsx"))
+
+NuclearData2 <- data.frame(NuclearData$Longitude, NuclearData$Latitude)
+
+NuclearData3 <- na.omit(NuclearData2)
+
+
+# Going to plot the nuclear power plants and the ufo sightings on the same map
+
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , colour = "red", cex = .05 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , colour = "blue", cex = 1 )+
+    theme_classic() + # Remove Grey Background
+    ylim(25, 50) +
+    xlim(-130,-60) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))
+
+
 ```
