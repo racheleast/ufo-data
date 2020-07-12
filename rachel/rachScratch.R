@@ -32,3 +32,21 @@
 # This piece of code just plots our long/lat with no map behind it
 
 plot(longitudes,latitudes, ylim = c(10,70), xlim = c(-170,-50), cex= .05, col="blue", main = "UFO Sightings")
+
+
+# Interactive map with ggplotly 
+
+fig <- (mapufo <- ggplot() +
+          geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+          geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , colour = "red", cex = 3 ) + # Plot Data
+          geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , colour = "blue", cex = 5 )+
+          theme_classic() + # Remove Grey Background
+          ylim(34, 36) +
+          xlim(-94,-92) +
+          xlab("Longitude") +
+          ylab("Latitude") +
+          ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))
+
+fig2 <- ggplotly(fig)
+
+fig2
