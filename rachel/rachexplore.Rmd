@@ -1,0 +1,121 @@
+---
+title: "rachexplore"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r echo=FALSE, include=FALSE}
+
+library(mapview)
+library(sf)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(ggmap)
+library(rworldmap)
+library(readxl)
+library(plotly)
+
+here::here()
+
+data <- read_csv(here("nuforc_reports.csv"))
+
+```
+
+
+
+```{r map}
+
+longitudes <- na.omit(data$city_longitude) # Get rid of N/A rows 
+latitudes <- na.omit(data$city_latitude) # Get rid of N/A rows
+
+newrows <- data.frame(longitudes,latitudes) # Create new data frame with our revised variables
+
+world <- getMap(resolution = "low") # Get data for map
+
+# Make a map for all UFO sightings
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = newrows, aes(x = longitudes, y = latitudes) , colour = "red", cex = .05 ) + # Plot Data
+    theme_classic() + # Remove Grey Background
+    ylim(10, 70) +
+    xlim(-170,-50) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings"))
+```
+
+```{r}
+
+
+data$sighting_year <- lubridate::year(data$date_time)
+
+
+newdata <- data.frame(data$sighting_year ,data$city_longitude, data$city_latitude )
+newdata2 <- na.omit(newdata) # Get rid of empty rows
+
+
+earlydata <- subset(newdata2, newdata2$data.sighting_year <= 2005) # UFO sightings before 2005
+laterdata <- subset(newdata2, newdata2$data.sighting_year > 2005) # UFO sightings after 2005 
+
+# Make a map for earlydata
+
+world <- getMap(resolution = "low") # Get data for map
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , colour = "red", cex = .05 ) + # Plot Data
+    theme_classic() + # Remove Grey Background
+    ylim(10, 70) +
+    xlim(-170,-50) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings Before 2005"))
+
+# Make a map for laterdata
+
+world <- getMap(resolution = "low") # Get data for map
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = laterdata, aes(x = laterdata$data.city_longitude , y = laterdata$data.city_latitude) , colour = "blue", cex = .05 ) + # Plot Data
+    theme_classic() + # Remove Grey Background
+    ylim(10, 70) +
+    xlim(-170,-50) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings After 2005"))
+```
+
+
+```{r}
+
+
+NuclearData <- read_excel(here("NuclearData.xlsx"))
+
+NuclearData2 <- data.frame(NuclearData$Longitude, NuclearData$Latitude)
+
+NuclearData3 <- na.omit(NuclearData2)
+
+
+# Going to plot the nuclear power plants and the ufo sightings on the same map
+
+
+(mapufo <- ggplot() +
+    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , colour = "red", cex = .05 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , colour = "blue", cex = 1 )+
+    theme_classic() + # Remove Grey Background
+    ylim(25, 50) +
+    xlim(-130,-60) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))
+
+
+```
