@@ -19,6 +19,7 @@ library(ggmap)
 library(rworldmap)
 library(readxl)
 library(plotly)
+library(pander)
 
 here::here()
 
@@ -56,7 +57,7 @@ world <- getMap(resolution = "low") # Get data for map
 data$sighting_year <- lubridate::year(data$date_time)
 
 
-newdata <- data.frame(data$sighting_year ,data$city_longitude, data$city_latitude )
+newdata <- data.frame(data$sighting_year ,data$city_longitude, data$city_latitude)
 newdata2 <- na.omit(newdata) # Get rid of empty rows
 
 
@@ -119,3 +120,73 @@ NuclearData3 <- na.omit(NuclearData2)
 
 
 ```
+
+
+
+In this next section I am going to compare the number of power plants per state vs the number of sightings per state. I am going to be working with the early data. 
+
+```{r states}
+
+
+# Modifying Our Data
+
+
+NucPerState <- read_excel(here("NucPerState.xlsx")) # Data set w/states and their count of power plants
+
+statedata <- data.frame(data$sighting_year , data$state) # Creating a data set with just the year/state
+statedata2 <- na.omit(statedata) # Get rid of empty rows
+earlydata2 <- subset(statedata2, statedata2$data.sighting_year <= 2005) # UFO sightings before 2005
+
+earlydata22 <- earlydata2 %>% group_by(data.state) %>% summarise(count = n()) # This counts the number of sightings per state
+
+
+
+# This table will show the number of sightings and number of power plants per state
+
+
+perstate <- cbind(earlydata22, NucPerState$Count)
+
+
+
+# This next table will take the average number of sighting and compare it to number of power plants
+
+
+Count0 <- perstate[NucPerState$Count == 0, ]
+mean0 <- mean(Count0$count)
+
+Count1 <- perstate[NucPerState$Count == 1, ]
+mean1 <- mean(Count1$count)
+
+Count2 <- perstate[NucPerState$Count == 2, ]
+mean2 <- mean(Count2$count)
+
+Count3 <- perstate[NucPerState$Count == 3, ]
+mean3 <- mean(Count3$count)
+
+Count4 <- perstate[NucPerState$Count == 4, ]
+mean4 <- mean(Count4$count)
+
+Count5 <- perstate[NucPerState$Count == 5, ]
+mean5 <- mean(Count5$count)
+
+Count7 <- perstate[NucPerState$Count == 7, ]
+mean7 <- mean(Count7$count)
+
+Count9 <- perstate[NucPerState$Count == 9, ]
+mean9 <- mean(Count9$count)
+
+Count14 <- perstate[NucPerState$Count == 14, ]
+mean14 <- mean(Count14$count)
+
+averages <- rbind(mean0, mean1, mean2, mean3, mean4, mean5, mean7, mean9, mean14)
+numbers <- c(0, 1, 2, 3, 4, 5, 7, 9, 14)
+chart1 <- cbind(numbers, averages)
+colnames(chart1) = c("Number of Power Plants in the State", "Average Number of Sightings")
+rownames(chart1) = c()
+
+pander(chart1)
+plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Average Number of Sightings")
+cor(numbers, averages)
+```
+
+Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is defintely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
