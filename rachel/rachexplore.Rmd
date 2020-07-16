@@ -1,5 +1,5 @@
 ---
-title: "rachexplore"
+title: "UFO Sightings Exploratory Analysis "
 output: html_document
 ---
 
@@ -20,6 +20,8 @@ library(rworldmap)
 library(readxl)
 library(plotly)
 library(pander)
+library(usmap)
+
 
 here::here()
 
@@ -27,31 +29,35 @@ data <- read_csv(here("nuforc_reports.csv"))
 
 ```
 
+### Maps of Sightings
 
 
-```{r map}
+```{r map, echo=FALSE, warning=FALSE, message=FALSE}
 
 longitudes <- na.omit(data$city_longitude) # Get rid of N/A rows 
 latitudes <- na.omit(data$city_latitude) # Get rid of N/A rows
 
 newrows <- data.frame(longitudes,latitudes) # Create new data frame with our revised variables
 
-world <- getMap(resolution = "low") # Get data for map
+world <- getMap(resolution = "medium") # Get data for map
 
 # Make a map for all UFO sightings
 
 (mapufo <- ggplot() +
     geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
-    geom_point(data = newrows, aes(x = longitudes, y = latitudes) , colour = "red", cex = .05 ) + # Plot Data
+    geom_point(data = newrows, aes(x = longitudes, y = latitudes) , colour = "green4", cex = .05 ) + # Plot Data
     theme_classic() + # Remove Grey Background
     ylim(10, 70) +
     xlim(-170,-50) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings"))
+    ggtitle("UFO Sightings"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
 
-```{r}
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 
 data$sighting_year <- lubridate::year(data$date_time)
@@ -66,7 +72,6 @@ laterdata <- subset(newdata2, newdata2$data.sighting_year > 2005) # UFO sighting
 
 # Make a map for earlydata
 
-world <- getMap(resolution = "low") # Get data for map
 
 (mapufo <- ggplot() +
     geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
@@ -76,11 +81,11 @@ world <- getMap(resolution = "low") # Get data for map
     xlim(-170,-50) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings Before 2005"))
+    ggtitle("UFO Sightings Before 2005"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
 # Make a map for laterdata
 
-world <- getMap(resolution = "low") # Get data for map
 
 (mapufo <- ggplot() +
     geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
@@ -90,11 +95,18 @@ world <- getMap(resolution = "low") # Get data for map
     xlim(-170,-50) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings After 2005"))
+    ggtitle("UFO Sightings After 2005"))+
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
 
+##### We can see from these maps that a lot of the sightings tend to group together in certain areas. What is the reason for this? Our first perdiction is that there is a correlation between UFO activity and the U.S. nuclear power plants. We will be exploring this theory in the next section.
 
-```{r}
+
+### Nuclear Power Plant Analysis
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 
 NuclearData <- read_excel(here("NuclearData.xlsx"))
@@ -107,25 +119,28 @@ NuclearData3 <- na.omit(NuclearData2)
 # Going to plot the nuclear power plants and the ufo sightings on the same map
 
 
+MainStates <- map_data("state")
+
 (mapufo <- ggplot() +
-    geom_polygon(data = world, aes(x = long, y = lat, group = group), fill = NA, colour = "black") + # Plot Map
-    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , colour = "red", cex = .05 ) + # Plot Data
-    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , colour = "blue", cex = 1 )+
+    geom_polygon(data = MainStates, aes(x = long, y = lat, group = group), fill = NA, color = "black") + # Plot Map
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = .05 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 1.5 )+
     theme_classic() + # Remove Grey Background
     ylim(25, 50) +
-    xlim(-130,-60) +
+    xlim(-125,-65) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))
+    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))+
+    theme(plot.title = element_text(hjust = 0.5 , face = "bold"))
 
 
 ```
 
+##### From the map alone we can start to see that there is more sightings near power plants. 
 
+##### In this next section I am going to compare the number of power plants per state vs the number of sightings per state. I am going to be working with the early data (before 2005). 
 
-In this next section I am going to compare the number of power plants per state vs the number of sightings per state. I am going to be working with the early data. 
-
-```{r states}
+```{r states, echo=FALSE, warning=FALSE, message=FALSE}
 
 
 # Modifying Our Data
@@ -142,6 +157,7 @@ earlydata22 <- earlydata2 %>% group_by(data.state) %>% summarise(count = n()) # 
 
 
 # This table will show the number of sightings and number of power plants per state
+# I am not going to display this table as it is very large and it doesn't provide information that is easy to interpet/visualize 
 
 
 perstate <- cbind(earlydata22, NucPerState$Count)
@@ -185,8 +201,14 @@ colnames(chart1) = c("Number of Power Plants in the State", "Average Number of S
 rownames(chart1) = c()
 
 pander(chart1)
-plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Average Number of Sightings")
-cor(numbers, averages)
+plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Average Number of Sightings", col = "red", main = "UFO Sightings Before 2005 VS Nuclear Power Plants", pch = 19)
+#cor(numbers, averages)
 ```
 
-Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is defintely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
+##### Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is defintely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
+
+
+```{r}
+
+
+```
