@@ -70,6 +70,7 @@ newdata2 <- na.omit(newdata) # Get rid of empty rows
 earlydata <- subset(newdata2, newdata2$data.sighting_year <= 2005) # UFO sightings before 2005
 laterdata <- subset(newdata2, newdata2$data.sighting_year > 2005) # UFO sightings after 2005 
 
+
 # Make a map for earlydata
 
 
@@ -111,7 +112,7 @@ laterdata <- subset(newdata2, newdata2$data.sighting_year > 2005) # UFO sighting
 
 NuclearData <- read_excel(here("NuclearData.xlsx"))
 
-NuclearData2 <- data.frame(NuclearData$Longitude, NuclearData$Latitude)
+NuclearData2 <- data.frame(NuclearData$`Reactor Name`,NuclearData$Longitude, NuclearData$Latitude)
 
 NuclearData3 <- na.omit(NuclearData2)
 
@@ -124,7 +125,7 @@ MainStates <- map_data("state")
 (mapufo <- ggplot() +
     geom_polygon(data = MainStates, aes(x = long, y = lat, group = group), fill = NA, color = "black") + # Plot Map
     geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = .05 ) + # Plot Data
-    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 1.5 )+
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 1.5 ) +
     theme_classic() + # Remove Grey Background
     ylim(25, 50) +
     xlim(-125,-65) +
@@ -207,8 +208,66 @@ plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Av
 
 ##### Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is defintely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
 
+#### Nuclear Range 
+
 
 ```{r}
 
+# Creating a new table with ranges for our longitudes and latittudes
 
+
+NuclearData4 <- data.frame(NuclearData3$NuclearData..Reactor.Name., NuclearData3$NuclearData.Longitude - .5, NuclearData3$NuclearData.Longitude + .5, NuclearData3$NuclearData.Latitude - .5, NuclearData3$NuclearData.Latitude + .5)
+colnames(NuclearData4) = c("Reactor Name", "Lower Longitude", "Upper Longitude", "Lower Latitude", "Upper Latitude")
+
+
+# Iterating through both data sets to count the number of sightings in our ranges 
+
+
+x = c()
+
+for(i in 1:nrow(NuclearData4)){
+    y <- 0
+   for (j in 1:nrow(earlydata)){
+       if(NuclearData4[i,2] <= earlydata[j,2] && earlydata[j,2] <= NuclearData4[i,3] && NuclearData4[i,4] <= earlydata[j,3] && earlydata[j,3] <= NuclearData4[i,5]) {y <- y + 1}
+       else {}
+       } 
+    if(y >= 0){ x <- append(x, y)}
+} 
+  
+
+```
+
+Notes : The code works, but it is fairly slow. In python we would use vectorized for loops to increase speed but I am unsure of how to do this in R.
+
+
+```{r}
+
+counting <- data.frame(x) # Making vector into data frame so its easier to put into table
+
+newtable <- cbind(NuclearData4$`Reactor Name`, counting) # Creating new table
+colnames(newtable) = c("Reactor Name", "Count")
+
+
+newtable
+sum(counting)
+```
+
+Notes: Something seems to have gone wrong. Our counts in the table seems very low and the total counts are only making up about 22% of our total sightings before 2005. 
+
+Also, it seems to be harder to convert longitude/latitude to miles than we thought. Some sites are saying that one degree is about 60 miles which is why I did a plus/minus of .5 , but other sites say it depends on how close you are to the equator. I will definitely need to do some more reaserch on this. 
+
+I have decided to zoom in on the map and check our count for one of the power plants. I am using the power plant "Diablo Canyon 1" which on the table has 8 counts, but as you will see on the map there are only 6 sightings in our range. 
+
+
+```{r}
+(mapufo <- ggplot() +
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = 1 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 4 ) +
+    theme_classic() + # Remove Grey Background
+    ylim(34.71157, 35.71157) +
+    xlim(-121.35554, -120.35554) +
+    xlab("Longitude") +
+    ylab("Latitude") +
+    ggtitle("UFO Sightings at Diablo Canyon Power Plant")) +
+    theme(plot.title = element_text(hjust = 0.5 , face = "bold"))
 ```
