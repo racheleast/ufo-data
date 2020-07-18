@@ -211,12 +211,14 @@ plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Av
 #### Nuclear Range 
 
 
-```{r}
+##### One degree of latitude is approxiamtely 69 miles, and one degree of longitude is about 54.6 miles. We are going to be looking at the number of sightings that occur within one degree from our power plants. This accounts for about 15,069.6 square miles.   
+
+```{r }
 
 # Creating a new table with ranges for our longitudes and latittudes
 
 
-NuclearData4 <- data.frame(NuclearData3$NuclearData..Reactor.Name., NuclearData3$NuclearData.Longitude - .5, NuclearData3$NuclearData.Longitude + .5, NuclearData3$NuclearData.Latitude - .5, NuclearData3$NuclearData.Latitude + .5)
+NuclearData4 <- data.frame(NuclearData3$NuclearData..Reactor.Name., NuclearData3$NuclearData.Longitude - 1, NuclearData3$NuclearData.Longitude + 1, NuclearData3$NuclearData.Latitude - 1, NuclearData3$NuclearData.Latitude + 1)
 colnames(NuclearData4) = c("Reactor Name", "Lower Longitude", "Upper Longitude", "Lower Latitude", "Upper Latitude")
 
 
@@ -240,32 +242,34 @@ for(i in 1:nrow(NuclearData4)){
 Notes : The code works, but it is fairly slow. In python we would use vectorized for loops to increase speed but I am unsure of how to do this in R.
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 counting <- data.frame(x) # Making vector into data frame so its easier to put into table
 
 newtable <- cbind(NuclearData4$`Reactor Name`, counting) # Creating new table
-colnames(newtable) = c("Reactor Name", "Count")
+colnames(newtable) = c("Reactor Name", "Count of Sightings Near")
 
 
-newtable
-sum(counting)
+pander(newtable)
+p = rbind( sum(counting), 4737)
+colnames(p) = c("Number of Sightings")
+rownames(p)= c("Near Power Plants", "Total")
+
+pander(p)
 ```
 
-Notes: Something seems to have gone wrong. Our counts in the table seems very low and the total counts are only making up about 22% of our total sightings before 2005. 
+##### From this data we can see that about 84% of our sightings occur within about 55-70 miles from our power plants. 
 
-Also, it seems to be harder to convert longitude/latitude to miles than we thought. Some sites are saying that one degree is about 60 miles which is why I did a plus/minus of .5 , but other sites say it depends on how close you are to the equator. I will definitely need to do some more reaserch on this. 
-
-I have decided to zoom in on the map and check our count for one of the power plants. I am using the power plant "Diablo Canyon 1" which on the table has 8 counts, but as you will see on the map there are only 6 sightings in our range. 
+##### I have decided to zoom in on the map and check our count for one of the power plants. I am using the power plant "Diablo Canyon 1" which on the table has 14 counts, but as you will see on the map there are only 11 sightings in our range. I am unsure as to why the map isn't corresponding to the table. 
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 (mapufo <- ggplot() +
     geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = 1 ) + # Plot Data
     geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 4 ) +
     theme_classic() + # Remove Grey Background
-    ylim(34.71157, 35.71157) +
-    xlim(-121.35554, -120.35554) +
+    ylim(34.1, 36.2) +
+    xlim(-121.9, -119.7) +
     xlab("Longitude") +
     ylab("Latitude") +
     ggtitle("UFO Sightings at Diablo Canyon Power Plant")) +
