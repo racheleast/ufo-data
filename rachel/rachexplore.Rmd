@@ -122,18 +122,21 @@ NuclearData3 <- na.omit(NuclearData2)
 
 MainStates <- map_data("state")
 
-(mapufo <- ggplot() +
+mapufo <- ggplot() +
     geom_polygon(data = MainStates, aes(x = long, y = lat, group = group), fill = NA, color = "black") + # Plot Map
-    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = .05 ) + # Plot Data
-    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 1.5 ) +
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude, text = paste0(earlydata$data.sighting_year)) , color = "red", cex = .3 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude, text = paste0(NuclearData3$NuclearData..Reactor.Name.)) , color = "blue", cex = 1) +
     theme_classic() + # Remove Grey Background
     ylim(25, 50) +
     xlim(-125,-65) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants"))+
+    ggtitle("UFO Sightings Before 2005 With U.S. Nuclear Power Plants") +
     theme(plot.title = element_text(hjust = 0.5 , face = "bold"))
 
+fig2 <- ggplotly(mapufo, tooltip = "text")
+
+fig2
 
 ```
 
@@ -206,7 +209,7 @@ plot(numbers, averages, xlab = "Number of Power Plants in the State", ylab = "Av
 #cor(numbers, averages)
 ```
 
-##### Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is defintely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
+##### Based on our visuals it seems like we have a positive correlation between the number of power plants and the number of sightings. California and South Carolina are the 2 states that have 7 power plants, but California has 650 sightings where as South Carolina has only 90. California is definitely the outlier of this data as the next highest number of sightings is 301 (Texas). Based on our "README" I think California has some other factors (San Andreas Fault, Los Angeles, Earthquakes) that contribute to more sightings. We will have to consider this as we continue our analysis. 
 
 #### Nuclear Range 
 
@@ -231,7 +234,7 @@ for(i in 1:nrow(NuclearData4)){
     y <- 0
    for (j in 1:nrow(earlydata)){
        if(NuclearData4[i,2] <= earlydata[j,2] && earlydata[j,2] <= NuclearData4[i,3] && NuclearData4[i,4] <= earlydata[j,3] && earlydata[j,3] <= NuclearData4[i,5]) {y <- y + 1}
-       else {}
+       else {y <- y+0}
        } 
     if(y >= 0){ x <- append(x, y)}
 } 
@@ -260,18 +263,33 @@ pander(p)
 
 ##### From this data we can see that about 84% of our sightings occur within about 55-70 miles from our power plants. 
 
-##### I have decided to zoom in on the map and check our count for one of the power plants. I am using the power plant "Diablo Canyon 1" which on the table has 14 counts, but as you will see on the map there are only 11 sightings in our range. I am unsure as to why the map isn't corresponding to the table. 
+##### I have decided to zoom in on the map and check the count for two of our power plants. I am using the power plant "Diablo Canyon 1" which on the table has 14 counts, but as you will see on the map there are only 10 sightings in our range. "Rancho Seco" has 85 counts on the table, but only 45 on the map. I am unsure as to why the map isn't corresponding to the table. 
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-(mapufo <- ggplot() +
-    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude) , color = "red", cex = 1 ) + # Plot Data
-    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude) , color = "blue", cex = 4 ) +
+
+
+fig <- (mapufo <- ggplot() +
+    geom_point(data = earlydata, aes(x = earlydata$data.city_longitude , y = earlydata$data.city_latitude, text = paste0(earlydata$data.sighting_year)) , color = "red", cex = 1 ) + # Plot Data
+    geom_point(data = NuclearData3, aes(x = NuclearData3$NuclearData.Longitude , y = NuclearData3$NuclearData.Latitude, text = paste0(NuclearData3$NuclearData..Reactor.Name.)) , color = "blue", cex = 2 ) +
+   geom_segment(aes(x = -121.85554, y = 	34.21157, xend = 	-121.85554, yend = 	36.21157)) +
+   geom_segment(aes(x = -121.85554, y = 	36.21157, xend = 	-119.85554, yend = 	36.21157)) +
+   geom_segment(aes(x = -119.85554, y = 	36.21157, xend = 	-119.85554, yend = 	34.21157)) +
+   geom_segment(aes(x = -119.85554, y = 	34.21157, xend = 	-121.85554, yend = 	34.21157)) +
+     
+   geom_segment(aes(x = -122.12167, y = 	37.34528, xend = 	-122.12167, yend = 	39.34528)) +
+   geom_segment(aes(x = -122.12167, y = 	39.34528, xend = 	-120.12167, yend = 	39.34528)) +
+   geom_segment(aes(x = -120.12167, y = 	39.34528, xend = 	-120.12167, yend =  37.34528)) +
+   geom_segment(aes(x = -120.12167, y = 	37.34528, xend = 	-122.12167, yend = 	37.34528)) +
     theme_classic() + # Remove Grey Background
-    ylim(34.1, 36.2) +
-    xlim(-121.9, -119.7) +
+    ylim(30, 40) +
+    xlim(-123, -118) +
     xlab("Longitude") +
     ylab("Latitude") +
-    ggtitle("UFO Sightings at Diablo Canyon Power Plant")) +
+    ggtitle("UFO Sightings at Diablo Canyon and Rancho Seco Power Plants")) +
     theme(plot.title = element_text(hjust = 0.5 , face = "bold"))
+
+fig3 <- ggplotly(fig, tooltip = "text")
+
+fig3
 ```
