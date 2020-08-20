@@ -57,8 +57,11 @@ ggplot() +
 
 ```
 
+
 ##### As we can see from the map, we have a lot of sightings. We are going to look at the relationship between the year and the number of sightings to help us determine a place to split the data. We believe a dichotomous data set will be more useful in our analysis.  
 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -135,7 +138,6 @@ laterdata <- subset(newdata2, newdata2$sighting_year > 2005) # UFO sightings aft
 ```
 
 ##### We can see from these maps that a lot of the sightings tend to group together in certain areas. What is the reason for this? Our first perdiction is that there is a correlation between UFO activity and the U.S. nuclear power plants. We will be exploring this hypothesis in the next section.
-
 
 ### Nuclear Power Plant Analysis
 
@@ -243,14 +245,18 @@ grid.arrange(plot1, plot2)
 
 ### Scaled Down Population
 
+
 ##### I tried to plot everything on one graph, but it didn't turn out great because sightings are in the hundreds and population is in the millions. I have decided to scale down population by dividing all our values by the population of the state with the lowest population value. In this case the state with th elowest population is Wyoming with 493,782.
+
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 earlydata22$State <- earlydata22$state
 perstate1 <- left_join(earlydata22, NucPerState, by = "State")
 perstate1$Population <- as.integer(perstate1$Population)
+
 perstate1$Population <- perstate1$Population / 493782
+
 
 scaled_summary <- perstate1 %>% group_by(Count) %>% summarise(avg_sightings = mean(count), avg_pop_scaled = mean(Population))
 
@@ -261,14 +267,6 @@ scaled_summary <- perstate1 %>% group_by(Count) %>% summarise(avg_sightings = me
     geom_point(data = scaled_summary, aes(x = scaled_summary$Count, y = scaled_summary$avg_sightings), color = "red", cex = 2) +
     xlab("Number of Power Plants in the State") +
     ylab("Average Scaled Population and Average Sightings"))
-
-```
-
-
-```{r}
-
-
-
 
 ```
 
