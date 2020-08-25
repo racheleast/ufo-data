@@ -246,11 +246,17 @@ grid.arrange(plot1, plot2)
 #### Scaled Down Population
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ##### I tried to plot everything on one graph, but it didn't turn out great because sightings are in the hundreds and population is in the millions. I have decided to scale down population by dividing all our values by the population of the state with the lowest population value. In this case the state with the lowest population is Wyoming with 493,782.
 =======
 
 ##### I tried to plot everything on one graph, but it didn't turn out great because sightings are in the hundreds and population is in the millions. I have decided to scale down population by dividing all our values by the population of the state with the lowest population value. In this case the state with th elowest population is Wyoming with 493,782.
 >>>>>>> 76e359c3f75bab3e7d587c0d30f70ad262ec1c71
+=======
+
+##### I tried to plot everything on one graph, but it didn't turn out great because sightings are in the hundreds and population is in the millions. I have decided to scale down population by dividing all our values by the population of the state with the lowest population value. In this case the state with th elowest population is Wyoming with 493,782.
+
+>>>>>>> 67457278a9e25921b3ba479c82de2171a9bd7cd8
 
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -277,6 +283,10 @@ scaled_summary <- perstate1 %>% group_by(Count) %>% summarise(avg_sightings = me
 ##### I will now try and perform linear regression with number of power plants and populatoin as our independent variables, and sightings as our dependent variable. 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 67457278a9e25921b3ba479c82de2171a9bd7cd8
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 model1 <- lm(scaled_summary$avg_sightings ~ scaled_summary$avg_pop_scaled + scaled_summary$Count )
@@ -290,8 +300,11 @@ plot(model1)
 ##### I believe that we are unable to perform a linear regression analysis on this data because the data isn't linear. 
 
 
+<<<<<<< HEAD
 =======
 >>>>>>> 76e359c3f75bab3e7d587c0d30f70ad262ec1c71
+=======
+>>>>>>> 67457278a9e25921b3ba479c82de2171a9bd7cd8
 #### Nuclear Range 
 
 
